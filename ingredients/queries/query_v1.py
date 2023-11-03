@@ -4,9 +4,6 @@ from ingredients.models import Ingredient, Category
 from ingredients.schema.schema_v1 import IngredientType, CategoryType
 
 
-#
-#     category_by_name = graphene.Field(CategoryType, name=graphene.String(required=True))
-
 class IngredientQuery(graphene.ObjectType):
     ingredients = graphene.List(IngredientType)
 
@@ -16,15 +13,14 @@ class IngredientQuery(graphene.ObjectType):
 
 
 class CategoryQuery(graphene.ObjectType):
-    categories = graphene.List(CategoryType)
-    category_by_name = graphene.Field(CategoryType, name=graphene.String(required=True))
-    category_by_id = graphene.Field(CategoryType, id=graphene.String(required=True))
+    category = graphene.Field(CategoryType, pk=graphene.String(), name=graphene.String())
 
-    def resolve_categories(self, info):
+    def resolve_category(self, info, pk=None, name=None):
+        """
+        Resolver for fetching a category by ID or name.
+        """
+        if pk:
+            return Category.objects.filter(id=pk).first()
+        elif name:
+            return Category.objects.filter(name__contains=name)
         return Category.objects.all()
-
-    def resolve_category_by_name(self, info, name):
-        return Category.objects.filter(name__contains=name)
-
-    def resolve_category_by_id(self, info, id):
-        return Category.objects.filter(id=id).first()

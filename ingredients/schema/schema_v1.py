@@ -1,3 +1,5 @@
+from graphene import relay
+
 from ingredients.models import Category, Ingredient
 from graphene_django import DjangoObjectType
 
@@ -7,6 +9,10 @@ class CategoryType(DjangoObjectType):
         model = Category
         fields = ("id", "name", "ingredients")
         description = "Represents a category."
+        filter_fields = {
+            'name': ['exact', 'icontains', 'istartswith'],
+        }
+        interfaces = (relay.Node,)
 
 
 class IngredientType(DjangoObjectType):
